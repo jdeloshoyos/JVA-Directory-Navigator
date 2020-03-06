@@ -23,11 +23,14 @@
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 'THE SOFTWARE.
 
-#compile exe "jcd.exe"
+#compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.06"
+$version="1.07"
 $drive_sel_label="System drives"
+
+' Version history:
+' 1.07: New method for changing directory on exit, using a batch file and without the ugly KillParent hack
 
 #include "win32api.inc"
 
@@ -354,13 +357,14 @@ function pbmain
 			' Clean up the screen and go to last directory specified
 			color 7,0
 			cls
-			oCons.PrintCredits
+			'oCons.PrintCredits
 			
 			' Create  new cmd.exe instance starting in the specified dir
 			' If we were last looking at the drive selection screen, set start_dir to the last current directory instead.
 			if start_dir=$drive_sel_label then start_dir=curdir$
-			newshell_pid=shell(environ$("COMSPEC")+" /K "+$DQ+"cd "+start_dir+"&&title %COMSPEC%"+$DQ)
-			KillParent	' This sounds harsher than it really is...
+			'newshell_pid=shell(environ$("COMSPEC")+" /K "+$DQ+"cd "+start_dir+"&&title %COMSPEC%"+$DQ)
+			'KillParent	' This sounds harsher than it really is...
+			stdout start_dir	' v1.07 - This outputs the directory to change to. The batch file takes care of the rest.
 			
 		else
 			' The directory passed as a command line parameter does not exist
