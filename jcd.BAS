@@ -433,6 +433,7 @@ end function
 
 sub KillParent()
 	' Finds the PID of the parent cmd.exe instance and kills it, so that a new cmd can be created.
+	' Not used anymore since v1.07 (we use an auxilliary batch file instead, to avoid this hack)
 	
 	local my_pid as long
 	local parent_pid as long
