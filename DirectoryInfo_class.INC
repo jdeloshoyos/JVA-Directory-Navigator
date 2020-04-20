@@ -67,11 +67,14 @@ class DirectoryInfo
 		
 		property set SortMode (byval i as long)
 			' Sets the sorting mode.
-			' 1 = Sort by file name (the default)
-			' 2 = Sort by last write time
-			' 3 = Sort by file size
+			' 1 = Sort by file name (the default) ascending
+			' 2 = Sort by last write time ascending
+			' 3 = Sort by file size ascending
+			' 4 = Sort by file name descending
+			' 5 = Sort by last write time descending
+			' 6 = Sort by file size descending
 			
-			if i>0 and i<4 then sort_mode=i
+			if i>0 and i<7 then sort_mode=i
 			
 		end property
 		
@@ -135,16 +138,28 @@ class DirectoryInfo
 			' 3 = Sort by file size
 			select case sort_mode
 				case 1
-					' Do nothing, this is the default sorting mode
+					' Sort by name, ascending. Do nothing, this is the default sorting mode
 				
 				case 2
-					' Sort by last write time. Dirs always go first.
-					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortByDate()
+					' Sort by last write time, ascending. Dirs always go first.
+					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortByDateAsc()
 				
 				case 3
-					' Sort by file size. Dirs always go first.
-					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortBySize()
+					' Sort by file size, ascending. Dirs always go first.
+					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortBySizeAsc()
 				
+				case 4
+					' Sort by name, descending. Dirs always go first.
+					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortByNameDesc()
+				
+				case 5
+					' Sort by last write time, descending. Dirs always go first.
+					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortByDateDesc()
+				
+				case 6
+					' Sort by file size, descending. Dirs always go first.
+					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortBySizeDesc()
+					
 			end select
 			
 		end method
@@ -168,19 +183,9 @@ class DirectoryInfo
 			' human readable date and time. Credit goes to José Roca
 			FileTimeToLocalFileTime(BYVAL VarPTR(dir_entries(idx-1).LastWriteTime), lft)
 			FileTimeToSystemTime(lft, st)
-			buffer = Format$(st.wMonth, "00")+"/"+Format$(st.wDay, "00")+"/"+Format$(st.wYear) + " " + _
-				Format$(st.wHour, "00")+":"+Format$(st.wMinute, "00")+":"+Format$(st.wSecond, "00")
-			
-			' If the date section is less than ten chars long (its maximum length, think "XX/XX/XXXX") then we
-			' insert enough spaces between date and time so that all time strings are aligned.
-			' NOTE: Not necessary anymore, as the date and time are always formatted to their maximum length.
-			'i=instr(buffer, " ")
-			'if i<11 then buffer=left$(buffer,i-1)+space$(12-i)+right$(buffer, len(buffer)-i)
-			
-			' The max possible length of the returned string is 19 chars (think "XX/XX/XXXX XX:XX:XX").
-			' If the returned string is shorter than that, we right pad it with spaces.
-			' NOTE: Not necessary anymore, as the date and time are always formatted to their maximum length.
-			'method=lset$(buffer, 19)
+			buffer = Format$(st.wYear) + "/" + Format$(st.wMonth, "00") + "/" + Format$(st.wDay, "00") + " " + _
+				Format$(st.wHour, "00") + ":" + Format$(st.wMinute, "00") + ":"+Format$(st.wSecond, "00")
+				
 			method=buffer
 			
 		end method
@@ -338,8 +343,61 @@ end class
 
 ' Auxiliary functions for custom ARRAY SORTing of the directory listings
 ' ----------------------------------------------------------------------
+function DirectoryInfo_class_SortByDateAsc(byref p1 as DirData, byref p2 as DirData) as long
+	function=DirectoryInfo_class_SortByDate(p1, p2, 1)
+end function
 
-function DirectoryInfo_class_SortByDate(byref p1 as DirData, byref p2 as DirData) as long
+function DirectoryInfo_class_SortBySizeAsc(byref p1 as DirData, byref p2 as DirData) as long
+	function=DirectoryInfo_class_SortBySize(p1, p2, 1)
+end function
+
+function DirectoryInfo_class_SortByDateDesc(byref p1 as DirData, byref p2 as DirData) as long
+	function=DirectoryInfo_class_SortByDate(p1, p2, -1)
+end function
+
+function DirectoryInfo_class_SortBySizeDesc(byref p1 as DirData, byref p2 as DirData) as long
+	function=DirectoryInfo_class_SortBySize(p1, p2, -1)
+end function
+
+function DirectoryInfo_class_SortByNameDesc(byref p1 as DirData, byref p2 as DirData) as long
+	' This is implemented right here, because the sort by name ascending is the default and doesn´t use a special sorting function.
+	local attr1 as dword
+	local attr2 as dword
+	local isdir1 as long
+	local isdir2 as long
+	
+	' First we'l get all directories first.
+	
+	attr1=p1.FileAttributes
+	attr2=p2.FileAttributes
+	
+	if bit(attr1, 4) then isdir1=1
+	if bit(attr2, 4) then isdir2=1
+	
+	if isdir1>isdir2 then
+		function=-1
+		exit function
+	end if
+	
+	if isdir1<isdir2 then
+		function=1
+		exit function
+	end if
+	
+	' We'll sort by file names, descending
+	if ucase$(p1.FileName)<ucase$(p2.FileName) then
+		function=1
+		exit function
+	end if
+	
+	if ucase$(p1.FileName)>ucase$(p2.FileName) then
+		function=-1
+		exit function
+	end if
+	
+end function
+
+function DirectoryInfo_class_SortByDate(p1 as DirData, p2 as DirData, order as long) as long
 	
 	local attr1 as dword
 	local attr2 as dword
@@ -366,29 +424,29 @@ function DirectoryInfo_class_SortByDate(byref p1 as DirData, byref p2 as DirData
 	
 	' Then, the date comparison
 	if p1.LastWriteTime<p2.LastWriteTime then
-		function=-1
+		function=-1 * order
 		exit function
 	end if
 	
 	if p1.LastWriteTime>p2.LastWriteTime then
-		function=1
+		function=1 * order
 		exit function
 	end if
 	
 	' Only if dates are equal, we'll sort by file names
-	if p1.FileName<p2.FileName then
+	if ucase$(p1.FileName)<ucase$(p2.FileName) then
 		function=-1
 		exit function
 	end if
 	
-	if p1.FileName>p2.FileName then
+	if ucase$(p1.FileName)>ucase$(p2.FileName) then
 		function=1
 		exit function
 	end if
 	
 end function
 
-function DirectoryInfo_class_SortBySize(byref p1 as DirData, byref p2 as DirData) as long
+function DirectoryInfo_class_SortBySize(p1 as DirData, p2 as DirData, order as long) as long
 	
 	local attr1 as dword
 	local attr2 as dword
@@ -420,22 +478,22 @@ function DirectoryInfo_class_SortBySize(byref p1 as DirData, byref p2 as DirData
 	size2=mak(quad, p2.FileSizeLow, p2.FileSizeHigh)
 	
 	if size1<size2 then
-		function=-1
+		function=-1 * order
 		exit function
 	end if
 	
 	if size1>size2 then
-		function=1
+		function=1 * order
 		exit function
 	end if
 	
 	' Only if sizes are equal, we'll sort by file names
-	if p1.FileName<p2.FileName then
+	if ucase$(p1.FileName)<ucase$(p2.FileName) then
 		function=-1
 		exit function
 	end if
 	
-	if p1.FileName>p2.FileName then
+	if ucase$(p1.FileName)>ucase$(p2.FileName) then
 		function=1
 		exit function
 	end if

@@ -26,7 +26,7 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.07"
+$version="1.08"
 $drive_sel_label="System drives"
 
 ' Version history:
@@ -235,9 +235,9 @@ function pbmain
 						oCons.ShowHelp
 						
 					case chr$(0)+chr$(60)	' F2
-						' Toggle sort mode. Available: Name, Date of last write, Size.
+						' Toggle sort mode. Available: Name, Date of last write, Size, in ascending and descending order.
 						incr sort_mode
-						if sort_mode>3 then sort_mode=1
+						if sort_mode>6 then sort_mode=1
 						oDir.SortMode=sort_mode
 						
 						if start_dir=$drive_sel_label then
@@ -411,14 +411,14 @@ function HumanFileSize(byval bytes as quad) as string
 	' The level variable tells us how many divisions we've made. Based on that, we can determine the order of magnitude (bytes, kb, mb, etc.)
 	' Up to yottabyte should suffice :)
 	result=switch$(level=0, " bytes", _
-						level=1, " kb", _
-						level=2, " mb", _
-						level=3, " gb", _
-						level=4, " tb", _
-						level=5, " pb", _
-						level=6, " eb", _
-						level=7, " zb", _
-						level=8, " yb")
+						level=1, " KB", _
+						level=2, " MB", _
+						level=3, " GB", _
+						level=4, " TB", _
+						level=5, " PB", _
+						level=6, " EB", _
+						level=7, " ZB", _
+						level=8, " YB")
 	
 	if level=0 then
 		result=ltrim$(str$(bytesfloat))+result

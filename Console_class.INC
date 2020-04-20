@@ -114,14 +114,23 @@ class ConsoleClass
 			
 			select case sort_mode
 				case 1
-					buffer="[F2]=Toggle sort (Name) "
+					buffer="[F2]=Toggle sort (Name Asc) "
 				
 				case 2
-					buffer="[F2]=Toggle sort (Date) "
+					buffer="[F2]=Toggle sort (Date Asc) "
 				
 				case 3
-					buffer="[F2]=Toggle sort (Size) "
+					buffer="[F2]=Toggle sort (Size Asc) "
 				
+				case 4
+					buffer="[F2]=Toggle sort (Name Desc) "
+				
+				case 5
+					buffer="[F2]=Toggle sort (Date Desc) "
+				
+				case 6
+					buffer="[F2]=Toggle sort (Size Desc) "
+					
 			end select
 			
 			buffer="  "+buffer+format$(current_position)+"/"+format$(num_entries)
