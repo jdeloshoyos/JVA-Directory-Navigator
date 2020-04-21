@@ -3,6 +3,9 @@
      Copyright (c) 2010 Jaime de los Hoyos M.
 --------------------------------------------------
 
+<div align="center">
+  <a href="https://youtu.be/HEZg5jP-x90"><img src="https://img.youtube.com/vi/HEZg5jP-x90/0.jpg" alt="See it in action!"></a>
+</div>
 
 USING THE APPLICATION
 ---------------------
