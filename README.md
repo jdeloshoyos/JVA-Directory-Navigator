@@ -6,6 +6,7 @@
 <div align="center">
   <a href="https://youtu.be/HEZg5jP-x90"><img src="https://img.youtube.com/vi/HEZg5jP-x90/0.jpg" alt="See it in action!"></a>
 </div>
+*Click the image to see a video clip*
 
 USING THE APPLICATION
 ---------------------
