@@ -26,11 +26,13 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.08"
+$version="1.09"
 $drive_sel_label="System drives"
 
 ' Version history:
 ' 1.07: New method for changing directory on exit, using a batch file and without the ugly KillParent hack
+' 1.08: Minor fixes
+' 1.09: Changed the output and the batch file for better error handling
 
 #include "win32api.inc"
 
@@ -364,19 +366,16 @@ function pbmain
 			if start_dir=$drive_sel_label then start_dir=curdir$
 			'newshell_pid=shell(environ$("COMSPEC")+" /K "+$DQ+"cd "+start_dir+"&&title %COMSPEC%"+$DQ)
 			'KillParent	' This sounds harsher than it really is...
-			stdout start_dir	' v1.07 - This outputs the directory to change to. The batch file takes care of the rest.
+			stdout $version+"*OK*"+start_dir	' v1.07 - This outputs the directory to change to. The batch file takes care of the rest.
 			
 		else
 			' The directory passed as a command line parameter does not exist
-			oCons.PrintCredits
-			stdout "Error - "+start_dir+" is not a valid directory."
+			stdout $version+"*ERROR*"+start_dir+" is not a valid directory or does not exist."
 		end if
 	else
 		' The minimum console dimensions are not met (!!! seriously, what kind of console do you have??)
 		' I mean, less than 80 x 20!? Come on!
-		oCons.PrintCredits
-		stdout "Error - Console too small"
-		stdout "A console size of at least 80 columns and 20 rows is required."
+		stdout $version+"*ERROR*A console size of at least 80 columns and 20 rows is required."
 	end if
 	
 	' Dereference the created objects
