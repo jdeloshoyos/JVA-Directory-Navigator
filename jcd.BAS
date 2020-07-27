@@ -26,13 +26,14 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.09"
+$version="1.10"
 $drive_sel_label="System drives"
 
 ' Version history:
 ' 1.07: New method for changing directory on exit, using a batch file and without the ugly KillParent hack
 ' 1.08: Minor fixes
 ' 1.09: Changed the output and the batch file for better error handling
+' 1.10: Escape certain special characters, necessary for the FOR /F command in batch files
 
 #include "win32api.inc"
 
@@ -366,6 +367,16 @@ function pbmain
 			if start_dir=$drive_sel_label then start_dir=curdir$
 			'newshell_pid=shell(environ$("COMSPEC")+" /K "+$DQ+"cd "+start_dir+"&&title %COMSPEC%"+$DQ)
 			'KillParent	' This sounds harsher than it really is...
+			
+			' v1.10: We need to escape certain characters that can break the FOR /F in the batch file.
+			' See https://www.robvanderwoude.com/escapechars.php for reference
+			replace "'" with "^'" in start_dir
+			replace "," with "^," in start_dir
+			replace ";" with "^;" in start_dir
+			replace "=" with "^=" in start_dir
+			replace "(" with "^(" in start_dir
+			replace ")" with "^)" in start_dir
+			
 			stdout $version+"*OK*"+start_dir	' v1.07 - This outputs the directory to change to. The batch file takes care of the rest.
 			
 		else

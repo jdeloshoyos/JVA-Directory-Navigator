@@ -8,12 +8,11 @@ set JCD_COMMAND=%%B
 set JCD_ARGUMENT=%%C
 )
 
+echo JVA Directory Navigator %JCD_VERSION%
 rem Take action based on executable's output
 if %JCD_COMMAND%==ERROR (
-echo JVA Directory Navigator %JCD_VERSION%
 echo Error: %JCD_ARGUMENT%
 ) ELSE (
-echo JVA Directory Navigator %JCD_VERSION%
 echo Switching current directory to %JCD_ARGUMENT% ...
 cd /d %JCD_ARGUMENT%
 )
