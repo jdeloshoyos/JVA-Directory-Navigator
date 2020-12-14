@@ -26,7 +26,7 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.10"
+$version="1.11"
 $drive_sel_label="System drives"
 
 ' Version history:
@@ -34,6 +34,7 @@ $drive_sel_label="System drives"
 ' 1.08: Minor fixes
 ' 1.09: Changed the output and the batch file for better error handling
 ' 1.10: Escape certain special characters, necessary for the FOR /F command in batch files
+' 1.11: Hidden directories are listed now
 
 #include "win32api.inc"
 

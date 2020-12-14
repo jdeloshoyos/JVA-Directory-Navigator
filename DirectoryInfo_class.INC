@@ -89,7 +89,7 @@ class DirectoryInfo
 			local buffer as string
 			
 			' Start with the directory entries
-			buffer=dir$(start_dir+"\*", only 16, to dir_entries(i))
+			buffer=dir$(start_dir+"\*", only 18, to dir_entries(i))	' 18 includes directories, normal and hidden
 			
 			if buffer<>"" then
 				incr i

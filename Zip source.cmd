@@ -1,0 +1,1 @@
+7za a -tzip "JCD 1.XX.zip" @zip_source_list.txt -mx9

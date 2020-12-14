@@ -1,0 +1,11 @@
+[BAS Files]
+Primary Source File=.\jcd.BAS
+File 1=.\jcd.BAS
+Files=1
+[INC Files]
+File 1=.\CONSOLE_CLASS.INC
+File 2=.\DIRECTORYINFO_CLASS.INC
+File 3=C:\Users\Jaime\Includes PB\pb_proc.inc
+Files=3
+[RC Files]
+Files=0
