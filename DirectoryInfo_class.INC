@@ -87,32 +87,16 @@ class DirectoryInfo
 			
 			local i as long
 			local buffer as string
-			
-			' Start with the directory entries
-			buffer=dir$(start_dir+"\*", only 18, to dir_entries(i))	' 18 includes directories, normal and hidden
-			
-			if buffer<>"" then
-				incr i
-				total_bytes=total_bytes+me.GetEntrySize(i)
-				if i>max_entries then me.IncreaseArraySize		' Make the array grow if its boundary is reached
-				do
-					buffer=dir$(next to dir_entries(i))
-					if buffer="" then
-						exit do
-					else
-						incr i
-						total_bytes=total_bytes+me.GetEntrySize(i)
-						if i>max_entries then me.IncreaseArraySize
-					end if
-				loop
-			end if
-			
-			num_dirs=i
-			
-			' Now we retrieve everything BUT the subdirs.
-			buffer=dir$(start_dir+"\*", 6, to dir_entries(i))
+
+			' v1.11: We retrieve everything, files AND subdirs (including hidden items).
+			num_entries = 0
+			num_dirs = 0
+			buffer=dir$(start_dir+"\*", %NORMAL + %HIDDEN + %SYSTEM + %SUBDIR, to dir_entries(i))
 			
 			if buffer<>"" then
+				' Check if it's a directory
+				if bit(dir_entries(i).FileAttributes, 4) then incr num_dirs
+				
 				incr i
 				total_bytes=total_bytes+me.GetEntrySize(i)
 				if i>max_entries then me.IncreaseArraySize
@@ -121,6 +105,9 @@ class DirectoryInfo
 					if buffer="" then
 						exit do
 					else
+						' Check if it's a directory
+						if bit(dir_entries(i).FileAttributes, 4) then incr num_dirs
+						
 						incr i
 						total_bytes=total_bytes+me.GetEntrySize(i)
 						if i>max_entries then me.IncreaseArraySize
@@ -138,7 +125,8 @@ class DirectoryInfo
 			' 3 = Sort by file size
 			select case sort_mode
 				case 1
-					' Sort by name, ascending. Do nothing, this is the default sorting mode
+					' Sort by name, descending. Dirs always go first. This is the default sorting mode.
+					array sort dir_entries(0) for num_entries, using DirectoryInfo_class_SortByNameAsc()
 				
 				case 2
 					' Sort by last write time, ascending. Dirs always go first.
@@ -343,12 +331,20 @@ end class
 
 ' Auxiliary functions for custom ARRAY SORTing of the directory listings
 ' ----------------------------------------------------------------------
+function DirectoryInfo_class_SortByNameAsc(byref p1 as DirData, byref p2 as DirData) as long
+	function=DirectoryInfo_class_SortByName(p1, p2, 1)
+end function
+
 function DirectoryInfo_class_SortByDateAsc(byref p1 as DirData, byref p2 as DirData) as long
 	function=DirectoryInfo_class_SortByDate(p1, p2, 1)
 end function
 
 function DirectoryInfo_class_SortBySizeAsc(byref p1 as DirData, byref p2 as DirData) as long
 	function=DirectoryInfo_class_SortBySize(p1, p2, 1)
+end function
+
+function DirectoryInfo_class_SortByNameDesc(byref p1 as DirData, byref p2 as DirData) as long
+	function=DirectoryInfo_class_SortByName(p1, p2, -1)
 end function
 
 function DirectoryInfo_class_SortByDateDesc(byref p1 as DirData, byref p2 as DirData) as long
@@ -359,8 +355,7 @@ function DirectoryInfo_class_SortBySizeDesc(byref p1 as DirData, byref p2 as Dir
 	function=DirectoryInfo_class_SortBySize(p1, p2, -1)
 end function
 
-function DirectoryInfo_class_SortByNameDesc(byref p1 as DirData, byref p2 as DirData) as long
-	' This is implemented right here, because the sort by name ascending is the default and doesn´t use a special sorting function.
+function DirectoryInfo_class_SortByName(p1 as DirData, p2 as DirData, order as long) as long
 	local attr1 as dword
 	local attr2 as dword
 	local isdir1 as long
@@ -384,14 +379,14 @@ function DirectoryInfo_class_SortByNameDesc(byref p1 as DirData, byref p2 as Dir
 		exit function
 	end if
 	
-	' We'll sort by file names, descending
+	' We'll sort by file names
 	if ucase$(p1.FileName)<ucase$(p2.FileName) then
-		function=1
+		function=-1 * order
 		exit function
 	end if
 	
 	if ucase$(p1.FileName)>ucase$(p2.FileName) then
-		function=-1
+		function=1 * order
 		exit function
 	end if
 	
