@@ -26,7 +26,7 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.11"
+$version="1.12"
 $drive_sel_label="System drives"
 
 ' Version history:
@@ -35,6 +35,7 @@ $drive_sel_label="System drives"
 ' 1.09: Changed the output and the batch file for better error handling
 ' 1.10: Escape certain special characters, necessary for the FOR /F command in batch files
 ' 1.11: Hidden directories are listed now
+' 1.12 : Check that directory has at least one entry before accepting ENTER key
 
 #include "win32api.inc"
 
@@ -180,40 +181,43 @@ function pbmain
 						end if
 					
 					case chr$(13)	' Enter
-						' Clear search parameters
-						search_str=""
-						search_index=1
-						
-						if start_dir=$drive_sel_label then
-							' We were at the drive selection screen
-							chdrive oDir.GetEntryName(current_position)
-							chdir "\"
-							start_dir=curdir$
-							current_position=1
-							current_offset=0
-							oDir.ScanDir(start_dir)
-							cls
-							oCons.DrawHeader(start_dir, oDir)
-							oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-							oCons.DrawFooter
-							oCons.DrawScreen(current_offset, oDir)
-							oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
-						elseif left$(oDir.GetEntryAttr(current_position), 1)="d" then
-							' It is a directory
-							chdir oDir.GetEntryName(current_position)
-							start_dir=curdir$
-							current_position=1
-							current_offset=0
-							oDir.ScanDir(start_dir)
-							cls
-							oCons.DrawHeader(start_dir, oDir)
-							oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-							oCons.DrawFooter
-							oCons.DrawScreen(current_offset, oDir)
-							oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
-						else
-							' It's a file, we try to open it as if from Windows Explorer
-							ShellExecute (%NULL, "open", start_dir+"\"+oDir.GetEntryName(current_position), "", "", %SW_SHOWNORMAL)
+						' v1.12: First we check that the current dir actually has at least one entry, or else we'll get *very* undefined results
+						if oDir.NumEntries > 0 then
+							' Clear search parameters
+							search_str=""
+							search_index=1
+							
+							if start_dir=$drive_sel_label then
+								' We were at the drive selection screen
+								chdrive oDir.GetEntryName(current_position)
+								chdir "\"
+								start_dir=curdir$
+								current_position=1
+								current_offset=0
+								oDir.ScanDir(start_dir)
+								cls
+								oCons.DrawHeader(start_dir, oDir)
+								oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
+								oCons.DrawFooter
+								oCons.DrawScreen(current_offset, oDir)
+								oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
+							elseif left$(oDir.GetEntryAttr(current_position), 1)="d" then
+								' It is a directory
+								chdir oDir.GetEntryName(current_position)
+								start_dir=curdir$
+								current_position=1
+								current_offset=0
+								oDir.ScanDir(start_dir)
+								cls
+								oCons.DrawHeader(start_dir, oDir)
+								oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
+								oCons.DrawFooter
+								oCons.DrawScreen(current_offset, oDir)
+								oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
+							else
+								' It's a file, we try to open it as if from Windows Explorer
+								ShellExecute (%NULL, "open", start_dir+"\"+oDir.GetEntryName(current_position), "", "", %SW_SHOWNORMAL)
+							end if
 						end if
 					
 					case chr$(0)+chr$(73)	' PageUp
