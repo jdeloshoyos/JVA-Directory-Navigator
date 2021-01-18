@@ -26,16 +26,17 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.12"
+$version="1.13"
 $drive_sel_label="System drives"
 
 ' Version history:
-' 1.07: New method for changing directory on exit, using a batch file and without the ugly KillParent hack
-' 1.08: Minor fixes
-' 1.09: Changed the output and the batch file for better error handling
-' 1.10: Escape certain special characters, necessary for the FOR /F command in batch files
-' 1.11: Hidden directories are listed now
+' 1.07 : New method for changing directory on exit, using a batch file and without the ugly KillParent hack
+' 1.08 : Minor fixes
+' 1.09 : Changed the output and the batch file for better error handling
+' 1.10 : Escape certain special characters, necessary for the FOR /F command in batch files
+' 1.11 : Hidden directories are listed now
 ' 1.12 : Check that directory has at least one entry before accepting ENTER key
+' 1.13 : Remove trailing slashes from path passed as argument
 
 #include "win32api.inc"
 
@@ -78,9 +79,12 @@ function pbmain
 		' If the specified dir was not a full path, we convert it to that.
 		if mid$(start_dir, 2, 1)<>":" then start_dir=curdir$+"\"+start_dir
 		
+		' v1.13: Trim trailing slashes/backslashes
+		start_dir = rtrim$(start_dir, any "\/")
+		
+	else
+		start_dir=curdir$
 	end if
-	
-	if start_dir="" then start_dir=curdir$
 	
 	if oCons.Width>=80 and oCons.Height>=20 then
 		' To avoid unpleasant results, this program requires a console width of 80 and height of 20 at minimum.
