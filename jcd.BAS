@@ -26,7 +26,7 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.13"
+$version="1.14"
 $drive_sel_label="System drives"
 
 ' Version history:
@@ -37,6 +37,7 @@ $drive_sel_label="System drives"
 ' 1.11 : Hidden directories are listed now
 ' 1.12 : Check that directory has at least one entry before accepting ENTER key
 ' 1.13 : Remove trailing slashes from path passed as argument
+' 1.14 : Handle path passed as argument if it ends in a period
 
 #include "win32api.inc"
 
@@ -91,6 +92,7 @@ function pbmain
 		if isfolder(start_dir) then
 			' The starting dir is valid, we are good to go
 			chdir start_dir
+			start_dir=curdir$	' v1.14: Handle "relative" paths passed as arguments (ending in . or .., specifically)
 			
 			' Initialize position/offset variables
 			current_position=1
