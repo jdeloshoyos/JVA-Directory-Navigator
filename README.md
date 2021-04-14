@@ -13,6 +13,8 @@ USING THE APPLICATION
 
 To start using the application, just extract the executable (jcd_bin.exe) and the auxilliary batch file (jcd.cmd) to a folder in your path. Then, you can run the application by typing "jcd" anytime you are at the command prompt (cmd.exe).
 
+Alternatively, you can use the included jcd\_ps.ps1 in PowerShell. It might be convenient to declare an alias in your profile (New-Alias jcd path-to-the-script\jcd_ps.ps1).
+
 Once inside the application, you’ll be presented with a directory listing of the current working directory (the directory you were currently on the command line). From there, you can:
 
 - Move through each entry with the **up and down arrow keys**, and the **PgUp and PgDn keys**.
