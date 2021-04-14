@@ -26,8 +26,9 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.14"
+$version="1.15"
 $drive_sel_label="System drives"
+%max_search_length=30
 
 ' Version history:
 ' 1.07 : New method for changing directory on exit, using a batch file and without the ugly KillParent hack
@@ -38,6 +39,7 @@ $drive_sel_label="System drives"
 ' 1.12 : Check that directory has at least one entry before accepting ENTER key
 ' 1.13 : Remove trailing slashes from path passed as argument
 ' 1.14 : Handle path passed as argument if it ends in a period
+' 1.15 : Search pattern shown in footer
 
 #include "win32api.inc"
 
@@ -105,7 +107,7 @@ function pbmain
 			cls
 			oCons.DrawHeader(start_dir, oDir)
 			oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-			oCons.DrawFooter
+			oCons.DrawFooter(search_str)
 			oCons.DrawScreen(current_offset, oDir)
 			oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
 			
@@ -169,7 +171,7 @@ function pbmain
 							cls
 							oCons.DrawHeader(start_dir, oDir)
 							oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-							oCons.DrawFooter
+							oCons.DrawFooter(search_str)
 							oCons.DrawScreen(current_offset, oDir)
 							oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
 						else
@@ -181,7 +183,7 @@ function pbmain
 							cls
 							oCons.DrawHeader(start_dir, oDir)
 							oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-							oCons.DrawFooter
+							oCons.DrawFooter(search_str)
 							oCons.DrawScreen(current_offset, oDir)
 							oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
 						end if
@@ -204,7 +206,7 @@ function pbmain
 								cls
 								oCons.DrawHeader(start_dir, oDir)
 								oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-								oCons.DrawFooter
+								oCons.DrawFooter(search_str)
 								oCons.DrawScreen(current_offset, oDir)
 								oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
 							elseif left$(oDir.GetEntryAttr(current_position), 1)="d" then
@@ -217,7 +219,7 @@ function pbmain
 								cls
 								oCons.DrawHeader(start_dir, oDir)
 								oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-								oCons.DrawFooter
+								oCons.DrawFooter(search_str)
 								oCons.DrawScreen(current_offset, oDir)
 								oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
 							else
@@ -272,7 +274,7 @@ function pbmain
 							cls
 							oCons.DrawHeader(start_dir, oDir)
 							oCons.DrawOffset(current_position, oDir.NumEntries, sort_mode)
-							oCons.DrawFooter
+							oCons.DrawFooter(search_str)
 							oCons.DrawScreen(current_offset, oDir)
 							oCons.DrawEntry(current_position, current_position-current_offset+2, 1, oDir)	' Highlight the first entry
 						
@@ -281,15 +283,21 @@ function pbmain
 					case chr$(32) to chr$(126)		' Any character within the printable range.
 						i=GetTickCount		' Check milliseconds elapsed since last boot.
 						if i-last_search_time<1000 then
-							' We add the character to the last search performed
-							last_search_time=i
-							search_str=search_str+keypressed
-							search_index=1
+							if len(search_str) < %max_search_length then
+								' We add the character to the last search performed
+								last_search_time=i
+								search_str=search_str+keypressed
+								search_index=1
+								oCons.DrawFooter(search_str)
+							else
+								beep
+							end if
 						else
 							' Too much time passed since the last entered search, we start a new one instead
 							last_search_time=i
 							search_str=keypressed
 							search_index=1
+							oCons.DrawFooter(search_str)
 						end if
 						
 						' We search within the current dir entries if there's a match starting with search_dir.

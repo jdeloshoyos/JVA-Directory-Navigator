@@ -141,8 +141,8 @@ class ConsoleClass
 			
 		end method
 		
-		method DrawFooter()
-			' Draws the footer containing the program keys
+		method DrawFooter(byval search_str as string)
+			' Draws the footer containing the program keys, and the current search pattern, if any
 			
 			local buffer as string
 			
@@ -155,6 +155,17 @@ class ConsoleClass
 			print "[F1]";
 			locate cons_height, 16
 			print "[ESC]";
+			
+			color 15, 1
+			locate cons_height, 30
+			if search_str = "" then
+				print "No search pattern";
+			else
+				print "Search pattern:";
+				color 14, 1
+				locate cons_height, 46
+				print search_str;
+			end if
 			
 		end method
 		
