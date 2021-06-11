@@ -26,7 +26,7 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.15"
+$version="1.16"
 $drive_sel_label="System drives"
 %max_search_length=30
 
@@ -40,6 +40,7 @@ $drive_sel_label="System drives"
 ' 1.13 : Remove trailing slashes from path passed as argument
 ' 1.14 : Handle path passed as argument if it ends in a period
 ' 1.15 : Search pattern shown in footer
+' 1.16 : Check for calling shell as first argument, and replace certain characters in output path for cmd.exe
 
 #include "win32api.inc"
 
