@@ -4,7 +4,7 @@
 $OldEncoding = [Console]::OutputEncoding
 [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(1252)
 
-$output = (jcd_bin.exe $args)
+$output = (jcd_bin.exe p $args)
 
 # Results parsing
 $output_array = $output.Split("*")

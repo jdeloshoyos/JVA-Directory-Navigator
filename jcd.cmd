@@ -2,7 +2,7 @@
 chcp 1252
 
 rem Parse the executable's output
-for /f "tokens=1,2,3 delims=*" %%A in ('jcd_bin.exe %1') do (
+for /f "tokens=1,2,3 delims=*" %%A in ('jcd_bin.exe c %1') do (
 set JCD_VERSION=%%A
 set JCD_COMMAND=%%B
 set JCD_ARGUMENT=%%C

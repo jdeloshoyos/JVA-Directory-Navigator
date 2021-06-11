@@ -62,6 +62,7 @@ function pbmain
 	local last_search_time as long
 	local search_index as long
 	local sort_mode as long
+	local calling_shell as string
 	
 	' Initialize the DirEntries and Cons objects
 	let oDir=class "DirectoryInfo"
@@ -70,8 +71,17 @@ function pbmain
 	search_index=1
 	sort_mode=1
 	
+	' v1.16: Check argument that specifies calling shell (c=cmd.exe, p=powershell)
+	calling_shell=ucase$(command$(1))
+	
+	if calling_shell<>"C" and calling_shell<>"P" then
+		' Invalid calling shell argument
+		stdout $version+"*ERROR*Invalid calling shell argument, should be C or P"
+		exit function
+	end if
+	
 	' Set starting dir. If none was specified, we use current dir.
-	start_dir=trim$(command$, $DQ)
+	start_dir=trim$(command$(2), $DQ)
 	
 	' Some checks if a command line parameter was passed
 	if start_dir<>"" then
@@ -389,12 +399,15 @@ function pbmain
 			
 			' v1.10: We need to escape certain characters that can break the FOR /F in the batch file.
 			' See https://www.robvanderwoude.com/escapechars.php for reference
-			replace "'" with "^'" in start_dir
-			replace "," with "^," in start_dir
-			replace ";" with "^;" in start_dir
-			replace "=" with "^=" in start_dir
-			replace "(" with "^(" in start_dir
-			replace ")" with "^)" in start_dir
+			' v1.16: This only applies if the calling shell is cmd.exe, ignore for powershell
+			if calling_shell="C" then
+				replace "'" with "^'" in start_dir
+				replace "," with "^," in start_dir
+				replace ";" with "^;" in start_dir
+				replace "=" with "^=" in start_dir
+				replace "(" with "^(" in start_dir
+				replace ")" with "^)" in start_dir
+			end if
 			
 			stdout $version+"*OK*"+start_dir	' v1.07 - This outputs the directory to change to. The batch file takes care of the rest.
 			
