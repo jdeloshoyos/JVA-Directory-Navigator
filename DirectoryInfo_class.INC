@@ -200,7 +200,7 @@ class DirectoryInfo
 			' 7	128	80		FILE_ATTRIBUTE_NORMAL	
 			' 8	256	100		
 			' 9	512	200		
-			' 10	1024	400		
+			' 10	1024	400	FILE_ATTRIBUTE_REPARSE_POINT        l	
 			' 11	2048	800	FILE_ATTRIBUTE_COMPRESSED				c
 			' 12	4096	1000		
 			' 13	8192	2000	FILE_ATTRIBUTE_NOT_CONTENT_INDEXED	i
@@ -214,18 +214,19 @@ class DirectoryInfo
 			local attr as dword
 			local attr_mask as string
 			
-			attr_mask="--------"
+			attr_mask="---------"
 			
 			attr=dir_entries(idx-1).FileAttributes
 			
 			if bit(attr, 4) then asc(attr_mask, 1)=asc("d")
-			if bit(attr, 0) then asc(attr_mask, 2)=asc("r")
-			if bit(attr, 1) then asc(attr_mask, 3)=asc("h")
-			if bit(attr, 2) then asc(attr_mask, 4)=asc("s")
-			if bit(attr, 5) then asc(attr_mask, 5)=asc("a")
-			if bit(attr, 11) then asc(attr_mask, 6)=asc("c")
-			if bit(attr, 13) then asc(attr_mask, 7)=asc("i")
-			if bit(attr, 14) then asc(attr_mask, 8)=asc("e")
+			if bit(attr, 10) then asc(attr_mask, 2)=asc("l")
+			if bit(attr, 0) then asc(attr_mask, 3)=asc("r")
+			if bit(attr, 1) then asc(attr_mask, 4)=asc("h")
+			if bit(attr, 2) then asc(attr_mask, 5)=asc("s")
+			if bit(attr, 5) then asc(attr_mask, 6)=asc("a")
+			if bit(attr, 11) then asc(attr_mask, 7)=asc("c")
+			if bit(attr, 13) then asc(attr_mask, 8)=asc("i")
+			if bit(attr, 14) then asc(attr_mask, 9)=asc("e")
 			
 			method=attr_mask
 			
@@ -450,7 +451,7 @@ function DirectoryInfo_class_SortBySize(p1 as DirData, p2 as DirData, order as l
 	local size1 as quad
 	local size2 as quad
 	
-	' First we'l get all directories first.
+	' First we'll get all directories
 	
 	attr1=p1.FileAttributes
 	attr2=p2.FileAttributes
