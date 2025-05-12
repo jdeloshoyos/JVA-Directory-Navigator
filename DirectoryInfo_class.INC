@@ -307,13 +307,15 @@ class DirectoryInfo
 			
 			if idx=0 then
 				for i=0 to num_entries-1
-					if lcase$(left$(dir_entries(i).FileName, search_str_len))=lcase$(search_str) then incr matches
+					'if lcase$(left$(dir_entries(i).FileName, search_str_len))=lcase$(search_str) then incr matches
+					if instr(lcase$(dir_entries(i).FileName), lcase$(search_str)) then incr matches
 				next i
 				
 				method=matches
 			else
 				for i=0 to num_entries-1
-					if lcase$(left$(dir_entries(i).FileName, search_str_len))=lcase$(search_str) then
+					'if lcase$(left$(dir_entries(i).FileName, search_str_len))=lcase$(search_str) then
+					if instr(lcase$(dir_entries(i).FileName), lcase$(search_str)) then
 						' Match found!
 						incr matches
 						last_match=i

@@ -26,7 +26,7 @@
 #compile exe "jcd_bin.exe"
 #dim all
 
-$version="1.18"
+$version="1.2"
 $drive_sel_label="System drives"
 %max_search_length=30
 
@@ -43,6 +43,7 @@ $drive_sel_label="System drives"
 ' 1.16 : Check for calling shell as first argument, and replace certain characters in output path for cmd.exe
 ' 1.17 : Fixed bug; pressing modifier keys (accents, etc.) froze the program with next keypress
 ' 1.18 : Included "l" letter for symlinks/reparse points in file attributes
+' 1.2  : Info about entry attributes in help. Search now searches for matches in any part of the entry
 
 #include "win32api.inc"
 
